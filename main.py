@@ -28,27 +28,35 @@ __version__ = '0.1'
 # ===============================================================================
 # IMPORT STATEMENTS
 # ===============================================================================
-from numpy import *  # IMPORTS ndarray(), arange(), zeros(), ones()
+import re
+import sys
+import xml.etree.ElementTree as ET
+import pandas as pd
+import plotly.express as px
+import dash
 
-set_printoptions(precision=5)
-set_printoptions(suppress=True)
-
-
-# from visual import *  # IMPORTS NumPy.*, SciPy.*, and Visual objects (sphere, box, etc.)
-# import matplotlib.pyplot as plt  # plt.plot(x,y)  plt.show()
-# from pylab import *  # IMPORTS NumPy.*, SciPy.*, and matplotlib.*
-# import os  # os.walk(basedir) FOR GETTING DIR STRUCTURE
-# import pickle  # pickle.load(fromfile)  pickle.dump(data, tofile)
-# from tkFileDialog import askopenfilename, askopenfile
-# from collections import namedtuple
-# from ctypes import *
-# import glob
-# import random
-# import cv2
 
 # ===============================================================================
 # METHODS
 # ===============================================================================
+def tcx2cvs():
+    istream = open("/Users/jean-marcbaubet/Downloads/Saint Jean Cimetière.tcx", 'r')
+    xml = istream.read()
+
+    xml = re.sub('xmlns=".*?"', '', xml)
+    root = ET.fromstringlist(xml)
+    for name in root.findall('Courses/Course/Name'):
+        print("Name : {}".format(name.text))
+
+    nomFichier = "/Users/jean-marcbaubet/Downloads/" + name.text + ".cvs"
+    fichierCvs = open(nomFichier, "w")
+    fichierCvs.write("Distance,Altitude,Latitude,Longitude\n")
+    for trackPoint in root.findall('Courses/Course/Track/Trackpoint'):
+        distance = float(trackPoint.find('DistanceMeters').text)
+        altitude = float(trackPoint.find('AltitudeMeters').text)
+        longitude = float(trackPoint.find('Position/LongitudeDegrees').text)
+        latitude = float(trackPoint.find('Position/LatitudeDegrees').text)
+        fichierCvs.write("{:4.0f},{:5.2f},{},{}\n".format(distance, altitude, longitude, latitude))
 
 
 # ===============================================================================
@@ -56,6 +64,7 @@ set_printoptions(suppress=True)
 # ===============================================================================
 def main():
     """Description of main()"""
+    tcx2cvs()
 
 
 if __name__ == '__main__':
